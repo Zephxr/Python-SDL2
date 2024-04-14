@@ -1,0 +1,77 @@
+#version 430
+in vec2 v_texcoord;
+in vec3 v_normal;
+in vec3 v_worldpos;
+
+#define AMBIENT_UP vec3(0.1,0.1,0.1)
+#define AMBIENT_DOWN vec3(0.2,0.2,0.2)
+
+out vec4 color;
+layout(binding=0) uniform sampler2DArray tex;
+
+float lambert(vec3 L, vec3 N ){
+    float diffuse = dot(L,N);
+    diffuse = max( 0.0, diffuse );
+    return diffuse;
+}
+
+float phong(vec3 V, vec3 R){
+    float specular = dot(V,R);
+    specular = max(specular,0.0);
+    specular = pow(specular,16.0);
+    return specular;
+}
+
+void main(){
+    
+    //surface normal
+    vec3 N = normalize(v_normal);
+    
+    //vector from surface to viewer
+    vec3 V = normalize( eyePos - v_worldpos);
+    
+    vec3 ambient = mix( AMBIENT_DOWN, AMBIENT_UP, 0.5*(N.y+1.0));
+    
+    vec3 totaldiffuse = vec3(0);
+    vec3 totalspecular = vec3(0);
+    
+    for(int i=0;i<MAX_LIGHTS;++i){
+        
+        //unpack data from uniforms
+        vec3 lightPosition = lightPositionsAndDirectionalFlag[i].xyz;
+        vec3 lightColor = lightColorsAndCosineSpotAngleCutoffs[i].xyz;
+        
+        //vector from surface to light
+        vec3 L = lightPosition - v_worldpos;
+        float lightDistance = length(L);
+        L /= lightDistance;
+
+        if( dot(N,L) < 0)
+            N=-N;
+        //reflection vector of light
+        vec3 R = reflect(-L,N);
+        
+        float diffuse = lambert( L,N );
+        float specular = 0.0;
+        if( diffuse > 0.0 )
+            specular = phong( V,R );
+            
+        //attenuation
+        float A = 1.0/(attenuation[0] + lightDistance*(attenuation[1] + lightDistance*attenuation[2]));
+        A=min(A,1.0);
+        diffuse *= A;
+        specular *= A;
+        
+        //add to running total
+        totaldiffuse += diffuse*lightColor;
+        totalspecular += specular*lightColor;
+    }
+   
+   
+    //combine texture + emission
+    vec3 texcoord = vec3(v_texcoord, 0);
+    vec4 texc = texture( tex, texcoord );
+    color.rgb = (ambient+totaldiffuse)*texc.rgb + totalspecular;
+    color.a = texc.a ;
+
+}

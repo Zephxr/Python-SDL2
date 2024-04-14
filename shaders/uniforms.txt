@@ -1,0 +1,26 @@
+layout( std140, row_major, binding=0 ) uniform Uniforms {
+    mat4 worldMatrix;
+    mat4 viewMatrix;
+    mat4 projMatrix;
+    float animationFrame;
+    float alphaFactor;
+    vec3 eyePos;
+    vec3 attenuation;
+      
+    #define MAX_LIGHTS 24
+    vec4 lightPositionsAndDirectionalFlag[MAX_LIGHTS];
+    vec4 spotDirectionsAndCosineSpotEdgeStarts[MAX_LIGHTS];
+    vec4 lightColorsAndCosineSpotAngleCutoffs[MAX_LIGHTS];
+    
+    mat4 clothInverseWorldMatrix;
+    vec4 clothSphere;
+    vec3 clothGravity;
+    vec3 clothWind;
+    int clothN;
+    float clothSpringK;
+    int clothCurrentSlice;
+    float clothMass;
+    float clothDamping;
+    float clothTime;
+    int clothInitialize;
+};

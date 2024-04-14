@@ -1,0 +1,33 @@
+#version 430
+
+layout(location=0) in vec3 position;
+layout(location=1) in vec2 texcoord;
+layout(binding=1) uniform sampler2DArray clothData;
+out vec3 v_normal;
+out vec3 v_worldpos;
+out vec2 v_texcoord;
+
+void main(){
+    ivec3 coord = ivec3(
+        position.x, position.z, clothCurrentSlice
+    );
+    vec4 p = texelFetch( clothData, coord, 0);
+    p.w=1.0;
+    p = p * worldMatrix;
+    v_worldpos = p.xyz;
+    p = p * viewMatrix * projMatrix;
+    gl_Position = p;
+    
+    vec3 N = texelFetch( clothData, coord+ivec3(0,1,0), 0 ).rgb;
+    vec3 S = texelFetch( clothData, coord-ivec3(0,1,0), 0 ).rgb;
+    vec3 E = texelFetch( clothData, coord+ivec3(1,0,0), 0 ).rgb;
+    vec3 W = texelFetch( clothData, coord-ivec3(1,0,0), 0 ).rgb;
+    
+    vec3 tangent = N-S;
+    vec3 binormal = E-W;
+    v_normal.xyz = cross(binormal,tangent);
+    v_normal = (vec4(v_normal,0.0) * worldMatrix).xyz;
+    
+    v_texcoord = texcoord;
+
+}

@@ -1,0 +1,19 @@
+#version 430
+out vec4 color;
+
+layout(binding=0) uniform sampler2DArray tex;
+layout(binding=15) uniform isampler2DArray chartex;
+
+void main(){
+    ivec2 tmp = ivec2(gl_FragCoord.xy);
+    ivec2 charSize = textureSize( tex, 0 ).xy;
+    int column = tmp.x / charSize.x;
+    int row = tmp.y / charSize.y;
+    int x = tmp.x % int(charSize.x);
+    int y = tmp.y % int(charSize.y);
+    int ascii = int(
+        texelFetch( chartex, ivec3(column,row,0), 0 ).r
+    );
+    vec4 tc = texelFetch(tex, ivec3(x,charSize.y-y-1,ascii),0);
+    color = vec4(1,1,1,tc);
+}
