@@ -22,7 +22,7 @@ import Lights
 from Cloth import Cloth
 
 def main():
-    win = etgg2801.createWindow(width=1920, height=1080)
+    win = etgg2801.createWindow(width=800, height=800)
     print( glGetString(GL_RENDERER), glGetString(GL_VENDOR), glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION))  
     globs = GlobalVars()
     setup(globs)
