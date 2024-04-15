@@ -1,2 +1,5 @@
 # Python SDL2
- Using SDL2 binaries, the program draws objects using a dynamic camera, sharders, and other essentials for a graphis library. 
+
+# Running
+
+Download the code and extract it into a folder.  After this, just run main.py.
