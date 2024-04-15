@@ -2,4 +2,4 @@
 
 # Running
 
-Downoad the code and extract it into a folder.  AFter this, just run main.py.
+Download the code and extract it into a folder.  After this, just run main.py.
